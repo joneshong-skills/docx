@@ -14,13 +14,17 @@ description: >-
   document generation. Trigger phrases: "create a Word doc", "generate docx",
   "edit Word file", "建立 Word 文件", "產生 docx", "寫 Word", "編輯 Word",
   "Word 報告", "Word 範本".
-version: 1.0.0
-tools: Bash, Read, Write, Edit
+version: 1.1.0
+tools: Bash, Read, Write, Edit, sandbox_execute
 argument-hint: "[document.docx] [describe what you want to do]"
 license: Proprietary. LICENSE.txt has complete terms
 ---
 
 # DOCX creation, editing, and analysis
+
+## Agent Delegation
+
+Delegate document processing to `worker` agent.
 
 ## Overview
 
@@ -357,6 +361,15 @@ Validates with auto-repair, condenses XML, and creates DOCX. Use `--validate fal
 
 - **Replace entire `<w:r>` elements**: When adding tracked changes, replace the whole `<w:r>...</w:r>` block with `<w:del>...<w:ins>...` as siblings. Don't inject tracked change tags inside a run.
 - **Preserve `<w:rPr>` formatting**: Copy the original run's `<w:rPr>` block into your tracked change runs to maintain bold, font size, etc.
+
+## Sandbox Optimization
+
+Reading and batch processing benefit from sandbox execution:
+
+- **Batch reading**: When analyzing multiple .docx files, use `sandbox_execute` to unpack and extract text/metadata from all files in one call, returning a structured summary instead of loading raw XML into context.
+- **Batch validation**: After creating or editing documents, run validation across multiple files in one sandbox call.
+
+Principle: **XML extraction + validation → sandbox; content editing decisions → LLM.**
 
 ## Continuous Improvement
 
